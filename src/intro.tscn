@@ -1,0 +1,32 @@
+[gd_scene load_steps=2 format=3 uid="uid://bl0l32vwma1rv"]
+
+[ext_resource type="Script" uid="uid://d1irb707more0" path="res://src/intro.gd" id="1_wdpu2"]
+
+[node name="Intro" type="Node2D"]
+script = ExtResource("1_wdpu2")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -45.0
+offset_top = -33.0
+offset_right = 45.0
+offset_bottom = 33.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="NewButton" type="Button" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+text = "New game"
+
+[node name="LoadButton" type="Button" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+text = "Load"
+
+[connection signal="pressed" from="CanvasLayer/VBoxContainer/NewButton" to="." method="_on_new_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/VBoxContainer/LoadButton" to="." method="_on_load_button_pressed"]

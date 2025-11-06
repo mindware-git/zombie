@@ -1,0 +1,24 @@
+[gd_scene load_steps=2 format=3 uid="uid://d3uwsgg7kri2v"]
+
+[ext_resource type="Script" uid="uid://budqd786u8v8s" path="res://src/customer.gd" id="1_ac51m"]
+
+[node name="Customer" type="Node2D"]
+script = ExtResource("1_ac51m")
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CharacterBody2D"]
+
+[node name="Order" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Take" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
