@@ -1,9 +1,22 @@
-[gd_scene load_steps=5 format=3 uid="uid://cptd0fn0dngjt"]
+[gd_scene load_steps=8 format=3 uid="uid://cptd0fn0dngjt"]
 
 [ext_resource type="Script" uid="uid://cjahnc52sc5hg" path="res://src/game.gd" id="1_7uq6d"]
 [ext_resource type="Texture2D" uid="uid://bujsyksklihf7" path="res://icon.svg" id="2_3msxb"]
+[ext_resource type="PackedScene" uid="uid://dmr0fcamx7t56" path="res://addons/virtual_joystick/virtual_joystick_scene.tscn" id="2_bs6l1"]
 [ext_resource type="Script" uid="uid://lndj4uiay8s7" path="res://src/restaurant_node.gd" id="2_kc8ui"]
 [ext_resource type="Script" uid="uid://dpegujtyrm56d" path="res://src/chef_node.gd" id="2_xq6wo"]
+[ext_resource type="Texture2D" uid="uid://b1x0vyeewbqkh" path="res://assets/main.png" id="6_pk08u"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bs6l1"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_pk08u")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_7uq6d")
@@ -31,19 +44,7 @@ size_flags_horizontal = 6
 layout_mode = 2
 size_flags_horizontal = 6
 
-[node name="ChefButton" type="Button" parent="CanvasLayer"]
-offset_left = 1023.0
-offset_top = 556.0
-offset_right = 1113.0
-offset_bottom = 587.0
-text = "Go to Chef"
-
-[node name="RestaurantButton" type="Button" parent="CanvasLayer"]
-offset_left = 34.0
-offset_top = 552.0
-offset_right = 171.0
-offset_bottom = 583.0
-text = "Go to restaurant"
+[node name="Virtual Joystick" parent="CanvasLayer" instance=ExtResource("2_bs6l1")]
 
 [node name="RestaurantNode" type="Node2D" parent="."]
 script = ExtResource("2_kc8ui")
@@ -70,9 +71,14 @@ offset_right = 826.0
 offset_bottom = 342.0
 texture = ExtResource("2_3msxb")
 
+[node name="CharacterBody2D" type="CharacterBody2D" parent="."]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CharacterBody2D"]
+position = Vector2(500, 200)
+scale = Vector2(0.1, 0.1)
+sprite_frames = SubResource("SpriteFrames_bs6l1")
+
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
-[connection signal="pressed" from="CanvasLayer/ChefButton" to="." method="_on_chef_button_pressed"]
-[connection signal="pressed" from="CanvasLayer/RestaurantButton" to="." method="_on_restaurant_button_pressed"]
 [connection signal="pressed" from="ChefNode/RiceButton" to="ChefNode" method="_on_rice_button_pressed"]
 [connection signal="released" from="ChefNode/RiceButton" to="ChefNode" method="_on_rice_button_released"]
 [connection signal="timeout" from="ChefNode/RiceButton/Timer" to="ChefNode" method="_on_timer_timeout"]
