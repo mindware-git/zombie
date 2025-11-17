@@ -19,6 +19,17 @@ config/icon="res://icon.svg"
 
 SaveManager="*res://src/global/save_manager.gd"
 
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="viewport"
+window/stretch/aspect="expand"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gut/plugin.cfg", "res://addons/virtual_joystick/plugin.cfg")
+
 [input_devices]
 
 pointing/emulate_touch_from_mouse=true
