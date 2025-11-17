@@ -22,12 +22,12 @@ var current_health: int
 #
 ## 컴포넌트 참조
 #var animation_player: AnimationPlayer
-#var sprite: Sprite2D
+var sprite: AnimatedSprite2D
 #var collision_shape: CollisionShape2D
 #
 ## 이동 관련
 #var input_direction: Vector2 = Vector2.ZERO
-#var current_direction: Vector2 = Vector2.UP
+var current_direction: Vector2 = Vector2.UP
 #
 ## 초기화
 func _ready():
@@ -35,7 +35,7 @@ func _ready():
 	#
 	## 컴포넌트 참조 가져오기
 	#animation_player = $AnimationPlayer
-	#sprite = $Sprite2D
+	sprite = $AnimatedSprite2D
 	#collision_shape = $CollisionShape2D
 	#
 	## 컴포넌트가 없으면 경고 출력
@@ -94,7 +94,17 @@ func _ready():
 	#update_sprite_direction()
 #
 ## 스프라이트 방향 업데이트
-#func update_sprite_direction():
+func update_sprite_direction():
+	var angle = current_direction.angle()
+	if angle > PI / 4:
+		sprite.animation = "down_left"
+	elif angle > -PI / 4:
+		sprite.animation = "down"
+	elif angle > -3 * PI / 4:
+		sprite.animation = "up"
+	else:
+		sprite.animation = "left"
+
 	#if sprite and current_direction.length() > 0:
 		## 8방향 스프라이트 회전 (필요시 조정)
 		#var angle = current_direction.angle()

@@ -53,7 +53,10 @@ func _ready():
 
 func _process(delta: float) -> void:
 	var direction = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	current_direction = direction.normalized()
 	velocity = direction * delta * 10000
+	update_sprite_direction()
+
 	move_and_slide()
 
 ## 컴포넌트 설정
