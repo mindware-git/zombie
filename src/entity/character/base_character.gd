@@ -2,19 +2,19 @@ extends CharacterBody2D
 class_name BaseCharacter
 
 ## 시그널 정의
-#signal health_changed(current_health: int, max_health: int)
+#signal health_changed(current_hp: int, max_hp: int)
 #signal character_died(character: BaseCharacter)
 #signal damage_dealt(target: BaseCharacter, damage: int)
 #signal stun_applied(duration: float)
 #signal character_healed(amount: int)
 
-@export var max_health: int = 100
+@export var max_hp: int = 100
 @export var movement_speed: float = 100.0
 #@export var acceleration: float = 500.0
 #@export var friction: float = 500.0
 #@export var rotation_speed: float = 5.0
 
-var current_health: int
+var current_hp: int
 #var is_alive: bool = true
 #var is_stunned: bool = false
 #var stun_timer: float = 0.0
@@ -23,15 +23,10 @@ var current_health: int
 ## 컴포넌트 참조
 #var animation_player: AnimationPlayer
 var sprite: AnimatedSprite2D
-#var collision_shape: CollisionShape2D
-#
-## 이동 관련
-#var input_direction: Vector2 = Vector2.ZERO
 var current_direction: Vector2 = Vector2.UP
-#
-## 초기화
+
 func _ready():
-	current_health = max_health
+	current_hp = max_hp
 	#
 	## 컴포넌트 참조 가져오기
 	#animation_player = $AnimationPlayer
@@ -96,53 +91,46 @@ func _ready():
 ## 스프라이트 방향 업데이트
 func update_sprite_direction():
 	var angle = current_direction.angle()
-	if angle > PI / 4:
-		sprite.animation = "down_left"
-	elif angle > -PI / 4:
-		sprite.animation = "down"
-	elif angle > -3 * PI / 4:
-		sprite.animation = "up"
-	else:
+	var abs_angle = abs(angle)
+	if abs_angle >= PI / 8 && abs_angle < 3 * PI / 8:
+		sprite.flip_h = true
+		if angle >= 0:
+			sprite.animation = "down_left"
+		else:
+			sprite.animation = "up_left"
+	elif abs_angle >= 3 * PI / 8 && abs_angle < 5 * PI / 8:
+		if angle >= 0:
+			sprite.animation = "down"
+		else:
+			sprite.animation = "up"
+	elif abs_angle >= 5 * PI / 8 && abs_angle < 7 * PI / 8:
+		sprite.flip_h = false
+		if angle >= 0:
+			sprite.animation = "down_left"
+		else:
+			sprite.animation = "up_left"
+	elif abs_angle >= 7 * PI / 8:
 		sprite.animation = "left"
+		sprite.flip_h = false
+	elif abs_angle < PI / 8 && abs_angle > 0:
+		sprite.animation = "left"
+		sprite.flip_h = true
 
-	#if sprite and current_direction.length() > 0:
-		## 8방향 스프라이트 회전 (필요시 조정)
-		#var angle = current_direction.angle()
-		#sprite.rotation = angle
-#
-## 데미지 처리
-#func take_damage(amount: int, attacker: BaseCharacter = null) -> bool:
-	#if not is_alive or invulnerable_timer > 0:
-		#return false
-	#
-	## 데미지 적용
-	#current_health = max(0, current_health - amount)
-	#
-	## 체력 변경 시그널
-	#health_changed.emit(current_health, max_health)
-	#
-	## 데미지 효과
-	#on_damage_taken(amount, attacker)
-	#
-	## 사망 체크
-	#if current_health <= 0:
-		#die()
-	#else:
-		## 짧은 무적 시간 부여
-		#invulnerable_timer = 0.5
-	#
-	#return true
-#
+func take_damage(amount: int) -> void:
+	current_hp -= amount
+	if current_hp < 0:
+		queue_free()
+
 ## 회복 처리
 #func heal(amount: int) -> bool:
-	#if not is_alive or current_health >= max_health:
+	#if not is_alive or current_hp >= max_hp:
 		#return false
 	#
-	#var old_health = current_health
-	#current_health = min(max_health, current_health + amount)
+	#var old_health = current_hp
+	#current_hp = min(max_hp, current_hp + amount)
 	#
 	## 회복량
-	#var actual_heal = current_health - old_health
+	#var actual_heal = current_hp - old_health
 	#
 	#if actual_heal > 0:
 		#character_healed.emit(actual_heal)
@@ -184,7 +172,7 @@ func update_sprite_direction():
 #
 ## 현재 체력 비율 (0.0 ~ 1.0)
 #func get_health_percentage() -> float:
-	#return float(current_health) / float(max_health)
+	#return float(current_hp) / float(max_hp)
 #
 ## 무적 상태인지 확인
 #func is_invulnerable() -> bool:
@@ -252,7 +240,7 @@ func update_sprite_direction():
 #func print_character_info():
 	#print("=== Character Info ===")
 	#print("Name: ", name)
-	#print("Health: ", current_health, "/", max_health)
+	#print("Health: ", current_hp, "/", max_hp)
 	#print("Alive: ", is_alive)
 	#print("Stunned: ", is_stunned)
 	#print("Position: ", global_position)
@@ -260,7 +248,7 @@ func update_sprite_direction():
 #
 ## 캐릭터 리셋
 #func reset_character():
-	#current_health = max_health
+	#current_hp = max_hp
 	#is_alive = true
 	#is_stunned = false
 	#stun_timer = 0.0
@@ -274,4 +262,4 @@ func update_sprite_direction():
 	#if sprite:
 		#sprite.modulate = Color.WHITE
 	#
-	#health_changed.emit(current_health, max_health)
+	#health_changed.emit(current_hp, max_hp)

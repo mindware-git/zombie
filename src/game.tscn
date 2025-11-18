@@ -1,8 +1,8 @@
-[gd_scene load_steps=7 format=4 uid="uid://cptd0fn0dngjt"]
+[gd_scene load_steps=9 format=4 uid="uid://cptd0fn0dngjt"]
 
 [ext_resource type="Script" uid="uid://cjahnc52sc5hg" path="res://src/game.gd" id="1_7uq6d"]
-[ext_resource type="PackedScene" uid="uid://dmr0fcamx7t56" path="res://addons/virtual_joystick/virtual_joystick_scene.tscn" id="2_bs6l1"]
 [ext_resource type="PackedScene" uid="uid://do56hern7xrg" path="res://src/entity/character/player.tscn" id="3_xq6wo"]
+[ext_resource type="Texture2D" uid="uid://bujsyksklihf7" path="res://icon.svg" id="4_bs6l1"]
 [ext_resource type="Texture2D" uid="uid://bq1r0dc1sviv0" path="res://assets/isometric-sandbox-sheet.png" id="4_kc8ui"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bs6l1"]
@@ -107,6 +107,11 @@ tile_shape = 1
 tile_size = Vector2i(32, 16)
 sources/1 = SubResource("TileSetAtlasSource_bs6l1")
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bs6l1"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_bs6l1"]
+radius = 123.79418
+
 [node name="Game" type="Node2D"]
 script = ExtResource("1_7uq6d")
 
@@ -132,18 +137,37 @@ grow_vertical = 2
 [node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/VBoxContainer"]
 layout_mode = 2
 
+[node name="HPLabel" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+
 [node name="TimeLabel" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 6
 
-[node name="MoneyLabel" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
+[node name="ItemButton" type="TextureButton" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 6
-
-[node name="Virtual Joystick" parent="CanvasLayer" instance=ExtResource("2_bs6l1")]
+texture_normal = ExtResource("4_bs6l1")
 
 [node name="Player" parent="." instance=ExtResource("3_xq6wo")]
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
 
+[node name="Radio" type="StaticBody2D" parent="."]
+position = Vector2(200, 100)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Radio"]
+shape = SubResource("RectangleShape2D_bs6l1")
+
+[node name="Sprite2D" type="Sprite2D" parent="Radio"]
+texture = ExtResource("4_bs6l1")
+
+[node name="DetectRange" type="Area2D" parent="Radio"]
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Radio/DetectRange"]
+shape = SubResource("CircleShape2D_bs6l1")
+
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
+[connection signal="body_entered" from="Radio/DetectRange" to="." method="_on_detect_range_body_entered"]
+[connection signal="body_exited" from="Radio/DetectRange" to="." method="_on_detect_range_body_exited"]

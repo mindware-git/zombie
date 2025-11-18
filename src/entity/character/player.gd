@@ -11,7 +11,7 @@ class_name Player
 #signal level_up(new_level: int)
 #
 
-@export var max_stamina: int = 100
+var max_stamina: int = 100
 #@export var stamina_regen_rate: float = 10.0 # 초당 스테미나 회복량
 #@export var current_level: int = 1
 #@export var current_experience: int = 0
@@ -27,29 +27,16 @@ var current_stamina: int
 #var is_attacking: bool = false
 #var attack_cooldown: float = 0.0
 
-## 컴포넌트 참조
-#var camera: Camera2D
-#var interaction_area: Area2D
-#var light: PointLight2D if Engine.has_singleton("PointLight2D") else null
+var current_interact_id: String
 
 func _ready():
 	super._ready()
-	#
-	## 스테미나 초기화
-	#current_stamina = max_stamina
-	#
-	## 컴포넌트 참조 가져오기
-	#camera = $Camera2D
-	#interaction_area = $InteractionArea
-	#if has_node("PointLight2D"):
-		#light = $PointLight2D
-	#
-	## 컴포넌트 설정
-	#setup_components()
-	#
-	## 상태 시그널 연결
-	#health_changed.connect(_on_health_changed)
-#
+	max_hp = SaveManager.game_data.max_hp
+	current_hp = SaveManager.game_data.current_hp
+	max_stamina = SaveManager.game_data.max_stamina
+	current_stamina = SaveManager.game_data.current_stamina
+	position = SaveManager.game_data.position
+
 
 func _process(delta: float) -> void:
 	var direction = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
@@ -84,40 +71,7 @@ func _process(delta: float) -> void:
 	#
 	## 액션 입력 처리
 	#handle_action_input(event)
-#
-## 이동 입력 처리
-#func handle_movement_input(event):
-	## 키보드 입력
-	#if event is InputEventKey:
-		#input_vector = Vector2.ZERO
-		#if Input.is_action_pressed("move_up"):
-			#input_vector.y -= 1
-		#if Input.is_action_pressed("move_down"):
-			#input_vector.y += 1
-		#if Input.is_action_pressed("move_left"):
-			#input_vector.x -= 1
-		#if Input.is_action_pressed("move_right"):
-			#input_vector.x += 1
-		#
-		## 달리기 입력
-		#is_sprinting = Input.is_action_pressed("sprint")
-	#
-	## 조이스틱 입력 (모바일)
-	#elif event is InputEventJoypadMotion:
-		#input_vector.x = Input.get_joy_axis(0, JOY_AXIS_LEFT_X)
-		#input_vector.y = Input.get_joy_axis(0, JOY_AXIS_LEFT_Y)
-#
-## 액션 입력 처리
-#func handle_action_input(event):
-	#if event.is_action_pressed("attack"):
-		#perform_attack()
-	#elif event.is_action_pressed("interact"):
-		#interact()
-	#elif event.is_action_pressed("use_item"):
-		#use_current_item()
-	#elif event.is_action_pressed("toggle_light"):
-		#toggle_light()
-#
+
 ## 물리 업데이트
 #func _physics_process(delta):
 	#super._physics_process(delta)
@@ -133,7 +87,7 @@ func _process(delta: float) -> void:
 	#
 	## 공격 쿨다운 업데이트
 	#update_attack_cooldown(delta)
-#
+
 ## 입력 업데이트
 #func update_input():
 	## 이동 방향 설정
@@ -268,76 +222,20 @@ func _process(delta: float) -> void:
 		#current_weapon = null
 		#weapon_unequipped.emit()
 		#print("Weapon unequipped")
-#
-## 상호작용
-#func interact():
-	#var interactables = get_interactables()
-	#if interactables.size() > 0:
-		#var nearest = get_nearest_interactable(interactables)
-		#if nearest.has_method("interact"):
-			#nearest.interact(self)
-#
-## 상호작용 가능한 오브젝트 가져오기
-#func get_interactables() -> Array:
-	#var objects = []
-	#if interaction_area:
-		#for body in interaction_area.get_overlapping_bodies():
-			#if body.has_method("interact"):
-				#objects.append(body)
-	#return objects
-#
-## 가장 가까운 상호작용 오브젝트 가져오기
-#func get_nearest_interactable(objects: Array):
-	#var nearest = null
-	#var nearest_distance = INF
-	#
-	#for obj in objects:
-		#var distance = global_position.distance_to(obj.global_position)
-		#if distance < nearest_distance:
-			#nearest_distance = distance
-			#nearest = obj
-	#
-	#return nearest
-#
-## 현재 아이템 사용
-#func use_current_item():
-	## 인벤토리 시스템과 연동 필요
-	#pass
-#
-## 라이트 토글
-#func toggle_light():
-	#if light:
-		#light.enabled = not light.enabled
-		#print("Light toggled: ", light.enabled)
-#
-## 경험치 획득
-#func gain_experience(amount: int):
-	#current_experience += amount
-	#experience_gained.emit(amount)
-	#
-	## 레벨 업 체크
-	#while current_experience >= experience_to_next_level:
-		#level_up()
-#
-## 레벨 업
-#func level_up():
-	#current_experience -= experience_to_next_level
-	#current_level += 1
-	#experience_to_next_level = calculate_experience_for_next_level()
-	#
-	## 스탯 증가
-	#max_health += 20
-	#current_health = max_health
-	#max_stamina += 10
-	#current_stamina = max_stamina
-	#
-	#level_up.emit(current_level)
-	#print("Level up! Current level: ", current_level)
-#
-## 다음 레벨所需 경험치 계산
-#func calculate_experience_for_next_level() -> int:
-	#return int(100 * pow(1.5, current_level - 1))
-#
+
+func interact_entered(interact_id: String):
+	current_interact_id = interact_id
+	print(current_interact_id)
+	$CanvasLayer/InteractButton.show()
+
+
+func interact_exited():
+	$CanvasLayer/InteractButton.hide()
+
+func interact():
+	if current_interact_id == "radio":
+		pass
+
 ## === 오버라이드된 가상 함수 ===
 #
 ## 데미지를 받았을 때
@@ -419,3 +317,7 @@ func _process(delta: float) -> void:
 	#if weapon_id != "":
 		## InventoryManager에서 무기 찾아 장착
 		#pass
+
+
+func _on_button_pressed() -> void:
+	SaveManager.game_data.current_hp -= 10

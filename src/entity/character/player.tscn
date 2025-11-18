@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://do56hern7xrg"]
+[gd_scene load_steps=10 format=3 uid="uid://do56hern7xrg"]
 
 [ext_resource type="Script" uid="uid://brft2fmwv7uaw" path="res://src/entity/character/player.gd" id="1_jf050"]
 [ext_resource type="Texture2D" uid="uid://nu624w5c4p7b" path="res://assets/down.png" id="2_wx0ku"]
@@ -6,6 +6,10 @@
 [ext_resource type="Texture2D" uid="uid://ckr0b0y75bv4i" path="res://assets/left.png" id="4_0gjpe"]
 [ext_resource type="Texture2D" uid="uid://dsng4uknd06ob" path="res://assets/up.png" id="5_827nk"]
 [ext_resource type="Texture2D" uid="uid://b5faax1187idi" path="res://assets/up_left.png" id="6_52nmw"]
+[ext_resource type="PackedScene" uid="uid://dmr0fcamx7t56" path="res://addons/virtual_joystick/virtual_joystick_scene.tscn" id="7_85uuk"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wx0ku"]
+size = Vector2(95.5, 125)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_jf050"]
 animations = [{
@@ -59,10 +63,31 @@ animations = [{
 }]
 
 [node name="Player" type="CharacterBody2D"]
+collision_layer = 3
 script = ExtResource("1_jf050")
 metadata/_custom_type_script = "uid://brft2fmwv7uaw"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-1.25, -0.5)
+shape = SubResource("RectangleShape2D_wx0ku")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_jf050")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Button" type="Button" parent="CanvasLayer"]
+offset_right = 8.0
+offset_bottom = 8.0
+text = "Player button"
+
+[node name="Virtual Joystick" parent="CanvasLayer" instance=ExtResource("7_85uuk")]
+
+[node name="InteractButton" type="Button" parent="CanvasLayer"]
+offset_left = 500.0
+offset_top = 500.0
+offset_right = 626.0
+offset_bottom = 531.0
+text = "Interact button"
+
+[connection signal="pressed" from="CanvasLayer/Button" to="." method="_on_button_pressed"]
