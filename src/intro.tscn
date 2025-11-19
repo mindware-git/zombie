@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://bl0l32vwma1rv"]
+[gd_scene load_steps=3 format=3 uid="uid://bl0l32vwma1rv"]
 
 [ext_resource type="Script" uid="uid://d1irb707more0" path="res://src/intro.gd" id="1_wdpu2"]
+[ext_resource type="Texture2D" uid="uid://behjfsusytue8" path="res://assets/story1 hd.png" id="2_oupes"]
 
 [node name="Intro" type="Node2D"]
 script = ExtResource("1_wdpu2")
@@ -28,5 +29,15 @@ text = "New game"
 layout_mode = 2
 text = "Load"
 
+[node name="TextureRect" type="TextureRect" parent="."]
+visible = false
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("2_oupes")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 3.0
+
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/NewButton" to="." method="_on_new_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/LoadButton" to="." method="_on_load_button_pressed"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
