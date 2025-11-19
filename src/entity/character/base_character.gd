@@ -14,7 +14,15 @@ class_name BaseCharacter
 #@export var friction: float = 500.0
 #@export var rotation_speed: float = 5.0
 
+## 공격 관련 변수
+@export var attack_range: float = 100.0
+@export var attack_damage: int = 20
+@export var attack_cooltime: float = 2.0
+
 var current_hp: int
+var attack_timer: float = 0.0
+var target: Node2D
+var raycast: RayCast2D
 #var is_alive: bool = true
 #var is_stunned: bool = false
 #var stun_timer: float = 0.0
@@ -32,7 +40,9 @@ func _ready():
 	#animation_player = $AnimationPlayer
 	sprite = $AnimatedSprite2D
 	#collision_shape = $CollisionShape2D
-	#
+	raycast = $RayCast2D
+	assert(raycast != null, "RayCast2D not found in " + name)
+
 	## 컴포넌트가 없으면 경고 출력
 	#if not animation_player:
 		#push_warning("AnimationPlayer not found in " + name)
@@ -118,8 +128,6 @@ func update_sprite_direction():
 
 func take_damage(amount: int) -> void:
 	current_hp -= amount
-	if current_hp < 0:
-		queue_free()
 
 ## 회복 처리
 #func heal(amount: int) -> bool:

@@ -6,6 +6,9 @@ const LATEST_FORMAT_VERSION = 1
 @export var owned_entities: Array[BaseEntity] = []
 @export var running_time: int = 0
 
+# Generator
+@export var generator_powered: bool = false
+
 # Player
 @export var max_hp: int = 100
 @export var current_hp: int = 100

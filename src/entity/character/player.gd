@@ -1,227 +1,44 @@
 extends BaseCharacter
 class_name Player
 
-## 플레이어 전용 시그널
-#signal weapon_equipped(weapon: WeaponResource)
-#signal weapon_unequipped()
-#signal item_picked_up(item: ItemResource)
-#signal skill_used(skill: SkillResource)
-#signal stamina_changed(current_stamina: int, max_stamina: int)
-#signal experience_gained(amount: int)
-#signal level_up(new_level: int)
-#
-
-var max_stamina: int = 100
-#@export var stamina_regen_rate: float = 10.0 # 초당 스테미나 회복량
-#@export var current_level: int = 1
-#@export var current_experience: int = 0
-#@export var experience_to_next_level: int = 100
-#
-## 입력 관련
-#var input_vector: Vector2 = Vector2.ZERO
-#var is_sprinting: bool = false
-#var sprint_stamina_cost: float = 20.0 # 초당 소모 스테미나
-
-var current_stamina: int
-#var current_weapon: WeaponResource = null
-#var is_attacking: bool = false
-#var attack_cooldown: float = 0.0
+enum WeaponType {FIST, GUN}
 
 var current_interact_id: String
+var max_stamina: int = 100
+var current_stamina: int = 100
+var attack_stamina_cost: int = 10
+var current_weapon: WeaponType = WeaponType.FIST
 
 func _ready():
 	super._ready()
-	max_hp = SaveManager.game_data.max_hp
-	current_hp = SaveManager.game_data.current_hp
-	max_stamina = SaveManager.game_data.max_stamina
-	current_stamina = SaveManager.game_data.current_stamina
-	position = SaveManager.game_data.position
-
+	global_position = SaveManager.game_data.position
+	update_hp_bar()
+	update_stamina_bar()
+	attack_damage = 50
 
 func _process(delta: float) -> void:
 	var direction = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	current_direction = direction.normalized()
-	velocity = direction * delta * 10000
+	velocity = direction * delta * 20000
 	update_sprite_direction()
+
+	# 공격 쿨타임 업데이트
+	if attack_timer > 0:
+		attack_timer -= delta
 
 	move_and_slide()
 
-## 컴포넌트 설정
-#func setup_components():
-	## 카메라 설정
-	#if camera:
-		#camera.enabled = true
-	#
-	## 상호작용 영역 설정
-	#if interaction_area:
-		#interaction_area.body_entered.connect(_on_interaction_area_entered)
-		#interaction_area.body_exited.connect(_on_interaction_area_exited)
-	#
-	## 라이트 설정
-	#if light:
-		#light.enabled = false
-#
-## 입력 처리
-#func _unhandled_input(event):
-	#if not is_alive or is_stunned:
-		#return
-	#
-	## 이동 입력 처리
-	#handle_movement_input(event)
-	#
-	## 액션 입력 처리
-	#handle_action_input(event)
-
-## 물리 업데이트
-#func _physics_process(delta):
-	#super._physics_process(delta)
-	#
-	#if not is_alive:
-		#return
-	#
-	## 입력 처리
-	#update_input()
-	#
-	## 스테미나 업데이트
-	#update_stamina(delta)
-	#
-	## 공격 쿨다운 업데이트
-	#update_attack_cooldown(delta)
-
-## 입력 업데이트
-#func update_input():
-	## 이동 방향 설정
-	#set_movement_direction(input_vector)
-	#
-	## 달리기 속도 조정
-	#if is_sprinting and current_stamina > 0:
-		#movement_speed = 150.0 # 달리기 속도
-	#else:
-		#movement_speed = 100.0 # 기본 속도
-#
-## 스테미나 업데이트
-#func update_stamina(delta: float):
-	#if is_sprinting and current_stamina > 0:
-		## 달리기 시 스테미나 소모
-		#current_stamina = max(0, current_stamina - int(sprint_stamina_cost * delta))
-	#elif current_stamina < max_stamina:
-		## 회복
-		#current_stamina = min(max_stamina, current_stamina + int(stamina_regen_rate * delta))
-	#
-	#stamina_changed.emit(current_stamina, max_stamina)
-#
-## 공격 쿨다운 업데이트
-#func update_attack_cooldown(delta: float):
-	#if attack_cooldown > 0:
-		#attack_cooldown -= delta
-		#if attack_cooldown <= 0:
-			#attack_cooldown = 0
-			#is_attacking = false
-#
-## 이동 처리 오버라이드
-#func handle_movement(delta: float):
-	#super.handle_movement(delta)
-	#
-	## 애니메이션 업데이트
-	#update_animation()
-#
-## 애니메이션 업데이트
-#func update_animation():
-	#if not animation_player:
-		#return
-	#
-	#var anim_name = "idle"
-	#
-	#if is_attacking:
-		#anim_name = "attack"
-	#elif input_vector.length() > 0.1:
-		#if is_sprinting:
-			#anim_name = "run"
-		#else:
-			#anim_name = "walk"
-	#
-	#if animation_player.has_animation(anim_name):
-		#if animation_player.current_animation != anim_name:
-			#animation_player.play(anim_name)
-#
-## 공격 수행
-#func perform_attack():
-	#if is_attacking or not current_weapon:
-		#return
-	#
-	#is_attacking = true
-	#attack_cooldown = 1.0 / current_weapon.fire_rate
-	#
-	## 공격 애니메이션
-	#if animation_player and animation_player.has_animation("attack"):
-		#animation_player.play("attack")
-	#
-	## 공격 로직
-	#execute_attack()
-#
-## 공격 실행
-#func execute_attack():
-	## 공격 범위 내의 적 탐지
-	#var attack_range = current_weapon.range
-	#var targets = get_targets_in_range(attack_range)
-	#
-	#for target in targets:
-		#if target is BaseCharacter and target != self:
-			#var damage = calculate_damage()
-			#if target.take_damage(damage, self):
-				#damage_dealt.emit(target, damage)
-#
-## 공격 범위 내의 타겟 가져오기
-#func get_targets_in_range(range: float) -> Array:
-	#var targets = []
-	#var space_state = get_world_2d().direct_space_state
-	#var query = PhysicsShapeQueryParameters2D.new()
-	#
-	## 원형 충돌 모양 생성
-	#var circle_shape = CircleShape2D.new()
-	#circle_shape.radius = range
-	#
-	#query.shape = circle_shape
-	#query.transform = Transform2D(0, global_position)
-	#query.collision_mask = 2 # 적 레이어
-	#query.exclude = [self]
-	#
-	#var results = space_state.intersect_shape(query)
-	#for result in results:
-		#if result.collider:
-			#targets.append(result.collider)
-	#
-	#return targets
-#
-## 데미지 계산
-#func calculate_damage() -> int:
-	#if not current_weapon:
-		#return 10 # 기본 데미지
-	#
-	#var base_damage = current_weapon.damage
-	#
-	## 크리티컬 확률 (10%)
-	#if randf() < 0.1:
-		#base_damage *= 2
-	#
-	#return base_damage
-#
-## 무기 장착
-#func equip_weapon(weapon: WeaponResource):
-	#if current_weapon:
-		#unequip_weapon()
-	#
-	#current_weapon = weapon
-	#weapon_equipped.emit(weapon)
-	#
-	#print("Weapon equipped: ", weapon.name)
-#
-## 무기 해제
-#func unequip_weapon():
-	#if current_weapon:
-		#current_weapon = null
-		#weapon_unequipped.emit()
-		#print("Weapon unequipped")
+func update_weapon(type: WeaponType):
+	if type == WeaponType.GUN:
+		current_weapon = WeaponType.GUN
+		attack_range = 200
+		attack_cooltime = 10
+		attack_damage = 200
+	else:
+		current_weapon = WeaponType.FIST
+		attack_range = 50
+		attack_cooltime = 0.5
+		attack_damage = 50
 
 func interact_entered(interact_id: String):
 	current_interact_id = interact_id
@@ -231,93 +48,195 @@ func interact_entered(interact_id: String):
 
 func interact_exited():
 	$CanvasLayer/InteractButton.hide()
+	$CanvasLayer/DialogueLabel.hide()
 
 func interact():
 	if current_interact_id == "radio":
-		pass
+		$CanvasLayer/DialogueLabel.text = "라디오를 켰습니다."
+		$CanvasLayer/DialogueLabel.show()
+	elif current_interact_id == "guard":
+		$CanvasLayer/AttackButton.show()
+		$CanvasLayer/AttackButton.show()
+		var key_item = load("res://src/entity/item/key.tres")
+		if not SaveManager.game_data.owned_entities.has(key_item):
+			SaveManager.game_data.owned_entities.append(key_item)
+			$CanvasLayer/DialogueLabel.text = "아이템 Key를 획득"
+		else:
+			$CanvasLayer/DialogueLabel.text = "이미 Key를 획득했습니다"
+		$CanvasLayer/DialogueLabel.show()
+	elif current_interact_id == "door":
+		var key_item = load("res://src/entity/item/key.tres")
+		if SaveManager.game_data.owned_entities.has(key_item):
+			# 문 열기 로직 - 게임 씬의 문 노드 찾기
+			var door_node = get_tree().current_scene.get_node("Door")
+			if door_node:
+				# 문의 충돌 모양 비활성화
+				door_node.get_node("CollisionShape2D").disabled = true
+				# 문의 시각적 효과 (위치를 위로 이동)
+				door_node.position.y -= 50
+				$CanvasLayer/DialogueLabel.text = "문이 열렸습니다!"
+			else:
+				$CanvasLayer/DialogueLabel.text = "문을 찾을 수 없습니다."
+		else:
+			$CanvasLayer/DialogueLabel.text = "문이 잠겨있습니다. Key가 필요합니다."
+		$CanvasLayer/DialogueLabel.show()
+	elif current_interact_id == "generator":
+		# Generator 토글 로직
+		var canvas_modulate = get_tree().current_scene.get_node("CanvasModulate")
+		if SaveManager.game_data.generator_powered:
+			# Generator 끄기
+			SaveManager.game_data.generator_powered = false
+			canvas_modulate.color = Color(0.3, 0.3, 0.3, 1.0) # 어둡게
+			$CanvasLayer/DialogueLabel.text = "발전기를 껐습니다."
+		else:
+			# Generator 켜기
+			SaveManager.game_data.generator_powered = true
+			canvas_modulate.color = Color.WHITE # 밝게
+			$CanvasLayer/DialogueLabel.text = "발전기를 켰습니다. 건물 전체에 불이 들어옵니다!"
+		$CanvasLayer/DialogueLabel.show()
+	$CanvasLayer/InteractButton.hide()
 
-## === 오버라이드된 가상 함수 ===
-#
-## 데미지를 받았을 때
-#func on_damage_taken(amount: int, attacker: BaseCharacter):
-	#super.on_damage_taken(amount, attacker)
-	#
-	## 플레이어 전용 피격 효과
-	#if camera:
-		#camera.shake(0.2, 5) # 카메라 흔들기
-#
-## 사망했을 때
-#func on_death():
-	#super.on_death()
-	#
-	## 플레이어 사망 처리
-	#if camera:
-		#camera.enabled = false
-	#
-	## 게임 오버 신호
-	#GameManager.game_over()
-#
-## === 시그널 핸들러 ===
-#
-## 체력 변경 시
-#func _on_health_changed(current: int, maximum: int):
-	## HUD 업데이트
-	#if GameManager.hud:
-		#GameManager.hud.update_health_bar(current, maximum)
-#
-## 상호작용 영역 진입
-#func _on_interaction_area_entered(body):
-	#if body.has_method("interact"):
-		## 상호작용 가능 표시
-		#print("Can interact with: ", body.name)
-#
-## 상호작용 영역 퇴장
-#func _on_interaction_area_exited(body):
-	#if body.has_method("interact"):
-		## 상호작용 불가능 표시
-		#print("Cannot interact with: ", body.name)
-#
-## === 유틸리티 함수 ===
-#
-## 플레이어 정보 출력
-#func print_player_info():
-	#print("=== Player Info ===")
-	#print("Level: ", current_level)
-	#print("Experience: ", current_experience, "/", experience_to_next_level)
-	#print("Health: ", current_health, "/", max_health)
-	#print("Stamina: ", current_stamina, "/", max_stamina)
-	#print("Weapon: ", current_weapon.name if current_weapon else "None")
-	#print("==================")
-#
-## 플레이어 데이터 저장 (GameDataResource용)
-#func get_player_data() -> Dictionary:
-	#return {
-		#"level": current_level,
-		#"experience": current_experience,
-		#"health": current_health,
-		#"max_health": max_health,
-		#"stamina": current_stamina,
-		#"max_stamina": max_stamina,
-		#"position": global_position,
-		#"current_weapon_id": current_weapon.id if current_weapon else ""
-	#}
-#
-## 플레이어 데이터 로드
-#func load_player_data(data: Dictionary):
-	#current_level = data.get("level", 1)
-	#current_experience = data.get("experience", 0)
-	#current_health = data.get("health", max_health)
-	#max_health = data.get("max_health", 100)
-	#current_stamina = data.get("stamina", max_stamina)
-	#max_stamina = data.get("max_stamina", 100)
-	#global_position = data.get("position", Vector2.ZERO)
-	#
-	## 무기 로드 (인벤토리 시스템과 연동 필요)
-	#var weapon_id = data.get("current_weapon_id", "")
-	#if weapon_id != "":
-		## InventoryManager에서 무기 찾아 장착
-		#pass
+func _on_interact_button_pressed() -> void:
+	interact()
 
 
-func _on_button_pressed() -> void:
-	SaveManager.game_data.current_hp -= 10
+func _on_attack_button_pressed() -> void:
+	if current_stamina >= attack_stamina_cost and attack_timer <= 0:
+		current_stamina -= attack_stamina_cost
+		update_stamina_bar()
+		execute_player_attack()
+	else:
+		if current_stamina < attack_stamina_cost:
+			# 스테미나 부족 메시지
+			$CanvasLayer/DialogueLabel.text = "스테미나가 부족합니다!"
+			$CanvasLayer/DialogueLabel.show()
+		else:
+			# 쿨타임 메시지
+			$CanvasLayer/DialogueLabel.text = "공격 쿨타임입니다!"
+			$CanvasLayer/DialogueLabel.show()
+
+func find_nearest_enemy() -> Enemy:
+	var enemies = get_tree().get_nodes_in_group("enemy")
+	var nearest_enemy: Enemy = null
+	var nearest_distance = attack_range
+	
+	for enemy in enemies:
+		var distance = global_position.distance_to(enemy.global_position)
+		if distance <= attack_range and distance < nearest_distance:
+			# RayCast2D로 시선 확인
+			raycast.target_position = (enemy.global_position - global_position).normalized() * attack_range
+			raycast.force_raycast_update()
+			
+			if not raycast.is_colliding() or raycast.get_collider() == enemy:
+				nearest_enemy = enemy
+				nearest_distance = distance
+	
+	return nearest_enemy
+
+func execute_player_attack():
+	var nearest_enemy = find_nearest_enemy()
+	if nearest_enemy:
+		target = nearest_enemy
+		
+		# RayCast2D로 타겟 조준
+		var direction = (target.global_position - global_position).normalized()
+		raycast.target_position = direction * attack_range
+		
+		# 타겟이 공격 가능한지 확인
+		if target.has_method("take_damage"):
+			target.take_damage(attack_damage)
+			attack_timer = attack_cooltime
+			print("적을 공격했습니다! 데미지: ", attack_damage)
+		else:
+			print("타겟이 공격 가능하지 않습니다.")
+	else:
+		print("공격 범위에 적이 없습니다.")
+
+
+func show_inventory():
+	# 인벤토리 UI 생성
+	var inventory_ui = Control.new()
+	inventory_ui.name = "InventoryUI"
+	inventory_ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	inventory_ui.process_mode = Node.PROCESS_MODE_ALWAYS # pause 상태에서도 입력 처리
+	
+	# 반투명 배경
+	var background = ColorRect.new()
+	background.color = Color(0, 0, 0, 0.8)
+	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	inventory_ui.add_child(background)
+	
+	# 메인 컨테이너
+	var main_container = VBoxContainer.new()
+	main_container.position = Vector2(100, 100)
+	main_container.size = Vector2(600, 400)
+	inventory_ui.add_child(main_container)
+	
+	# 제목
+	var title_label = Label.new()
+	title_label.text = "인벤토리"
+	title_label.add_theme_font_size_override("font_size", 24)
+	main_container.add_child(title_label)
+	
+	# 아이템 그리드
+	var grid_container = GridContainer.new()
+	grid_container.columns = 5
+	grid_container.size = Vector2(580, 300)
+	
+	# 슬롯 20개 생성 (소유한 아이템 표시)
+	for i in range(20):
+		var slot = ColorRect.new()
+		slot.size = Vector2(50, 50)
+		slot.custom_minimum_size = Vector2(50, 50)
+		
+		var slot_label = Label.new()
+		slot_label.position = Vector2(20, 15)
+		
+		# 소유한 아이템이 있으면 표시
+		if i < SaveManager.game_data.owned_entities.size():
+			var item = SaveManager.game_data.owned_entities[i]
+			slot.color = Color(0.6, 0.4, 0.2, 0.8) # 아이템이 있는 슬롯 색상
+			slot_label.text = "ID:" + str(item.id)
+		else:
+			slot.color = Color(0.3, 0.3, 0.3, 0.8) # 빈 슬롯 색상
+			slot_label.text = str(i + 1)
+		
+		slot.add_child(slot_label)
+		grid_container.add_child(slot)
+	
+	main_container.add_child(grid_container)
+	
+	# 닫기 버튼
+	var close_button = Button.new()
+	close_button.text = "닫기 (ESC)"
+	close_button.custom_minimum_size = Vector2(100, 40)
+	close_button.pressed.connect(hide_inventory)
+	main_container.add_child(close_button)
+	
+	# CanvasLayer에 추가
+	$CanvasLayer.add_child(inventory_ui)
+
+func hide_inventory():
+	get_tree().paused = false
+	var inventory_ui = $CanvasLayer.get_node_or_null("InventoryUI")
+	if inventory_ui:
+		inventory_ui.queue_free()
+
+func _on_inventory_button_pressed() -> void:
+	get_tree().paused = true
+	show_inventory()
+
+func take_damage(amount: int) -> void:
+	super.take_damage(amount)
+	update_hp_bar()
+	
+	if current_hp <= 0:
+		get_tree().change_scene_to_file("res://src/ending.tscn")
+
+func update_hp_bar():
+	var hp_percentage = float(current_hp) / float(max_hp) * 100.0
+	$CanvasLayer/VBoxContainer/HPBar.value = hp_percentage
+
+func update_stamina_bar():
+	var stamina_percentage = float(current_stamina) / float(max_stamina) * 100.0
+	$CanvasLayer/VBoxContainer/StaminaBar.value = stamina_percentage

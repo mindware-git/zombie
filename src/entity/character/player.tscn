@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://do56hern7xrg"]
+[gd_scene load_steps=15 format=3 uid="uid://do56hern7xrg"]
 
 [ext_resource type="Script" uid="uid://brft2fmwv7uaw" path="res://src/entity/character/player.gd" id="1_jf050"]
 [ext_resource type="Texture2D" uid="uid://nu624w5c4p7b" path="res://assets/down.png" id="2_wx0ku"]
@@ -7,6 +7,9 @@
 [ext_resource type="Texture2D" uid="uid://dsng4uknd06ob" path="res://assets/up.png" id="5_827nk"]
 [ext_resource type="Texture2D" uid="uid://b5faax1187idi" path="res://assets/up_left.png" id="6_52nmw"]
 [ext_resource type="PackedScene" uid="uid://dmr0fcamx7t56" path="res://addons/virtual_joystick/virtual_joystick_scene.tscn" id="7_85uuk"]
+[ext_resource type="Texture2D" uid="uid://bujsyksklihf7" path="res://icon.svg" id="8_0gjpe"]
+[ext_resource type="Texture2D" uid="uid://b5y8sxuynoepe" path="res://assets/rice.png" id="8_52nmw"]
+[ext_resource type="Texture2D" uid="uid://bg5g8ahgnm055" path="res://assets/bag.png" id="9_827nk"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wx0ku"]
 size = Vector2(95.5, 125)
@@ -62,7 +65,12 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="Player" type="CharacterBody2D"]
+[sub_resource type="Gradient" id="Gradient_0gjpe"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_827nk"]
+gradient = SubResource("Gradient_0gjpe")
+
+[node name="Player" type="CharacterBody2D" groups=["player"]]
 collision_layer = 3
 script = ExtResource("1_jf050")
 metadata/_custom_type_script = "uid://brft2fmwv7uaw"
@@ -76,18 +84,58 @@ sprite_frames = SubResource("SpriteFrames_jf050")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="Button" type="Button" parent="CanvasLayer"]
-offset_right = 8.0
-offset_bottom = 8.0
-text = "Player button"
-
 [node name="Virtual Joystick" parent="CanvasLayer" instance=ExtResource("7_85uuk")]
 
-[node name="InteractButton" type="Button" parent="CanvasLayer"]
-offset_left = 500.0
-offset_top = 500.0
-offset_right = 626.0
-offset_bottom = 531.0
-text = "Interact button"
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer"]
+offset_right = 40.0
+offset_bottom = 40.0
 
-[connection signal="pressed" from="CanvasLayer/Button" to="." method="_on_button_pressed"]
+[node name="HPBar" type="ProgressBar" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+value = 50.0
+
+[node name="StaminaBar" type="ProgressBar" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+value = 40.0
+
+[node name="InteractButton" type="TouchScreenButton" parent="CanvasLayer"]
+visible = false
+position = Vector2(790, 283)
+texture_normal = ExtResource("8_52nmw")
+
+[node name="AttackButton" type="TouchScreenButton" parent="CanvasLayer"]
+visible = false
+position = Vector2(1060, 513)
+texture_normal = ExtResource("8_0gjpe")
+
+[node name="DialogueLabel" type="Label" parent="CanvasLayer"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -27.5
+offset_top = -23.0
+offset_right = 27.5
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_horizontal = 4
+
+[node name="InventoryButton" type="TextureButton" parent="CanvasLayer"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
+offset_bottom = 40.0
+grow_horizontal = 0
+texture_normal = ExtResource("9_827nk")
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+texture = SubResource("GradientTexture2D_827nk")
+texture_scale = 3.0
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+
+[connection signal="pressed" from="CanvasLayer/InteractButton" to="." method="_on_interact_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/AttackButton" to="." method="_on_attack_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/InventoryButton" to="." method="_on_inventory_button_pressed"]

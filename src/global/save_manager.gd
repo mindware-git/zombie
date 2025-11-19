@@ -20,6 +20,17 @@ func format_check() -> void:
 		ResourceSaver.save(game_data, save_path)
 
 func save_game() -> void:
+	# Player 그룹의 노드들 가져오기
+	var players = get_tree().get_nodes_in_group("player")
+
+	# Player가 있는 경우에만 데이터 업데이트
+	if players.size() > 0:
+		var player = players[0] # 첫 번째 Player 사용
+		if player is Player:
+			game_data.position = player.global_position
+			game_data.current_hp = player.current_hp
+			game_data.max_hp = player.max_hp
+	
 	ResourceSaver.save(game_data, save_path)
 
 func remove_save_file() -> void:
