@@ -70,7 +70,7 @@ func test_attack_functionality():
 	# 공격 실행
 	enemy._handle_attack_state(0.1)
 	
-	assert_gt(enemy.attack_timer, 0, "공격 후 쿨타임이 설정되어야 함")
+	assert_gt(enemy.attack_timer, 0.0, "공격 후 쿨타임이 설정되어야 함")
 	assert_eq(test_player.current_hp, initial_hp - 20, "타겟이 20의 데미지를 받아야 함")
 
 func test_attack_cooldown():
@@ -112,8 +112,8 @@ func test_hp_bar_display():
 	assert_true(enemy.has_node("HPBarDisplay"), "데미지를 받으면 HP 바가 표시되어야 함")
 	
 	var hp_bar = enemy.get_node("HPBarDisplay") as ProgressBar
-	assert_eq(hp_bar.value, enemy.current_hp, "HP 바의 값이 현재 HP와 일치해야 함")
-	assert_eq(hp_bar.max_value, enemy.max_hp, "HP 바의 최대값이 최대 HP와 일치해야 함")
+	assert_eq(int(hp_bar.value), enemy.current_hp, "HP 바의 값이 현재 HP와 일치해야 함")
+	assert_eq(int(hp_bar.max_value), enemy.max_hp, "HP 바의 최대값이 최대 HP와 일치해야 함")
 
 func test_chase_state_movement():
 	# 추격 상태 이동 테스트

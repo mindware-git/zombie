@@ -124,7 +124,16 @@ func show_hp_bar():
 	# Enemy에 추가
 	add_child(hp_bar)
 	
-	# 1초 후 제거
-	await get_tree().create_timer(1.0).timeout
+	# Timer를 직접 생성하고 관리
+	var timer = Timer.new()
+	timer.wait_time = 1.0
+	timer.one_shot = true
+	timer.timeout.connect(_on_hp_bar_timer_timeout.bind(hp_bar, timer))
+	add_child(timer)
+	timer.start()
+
+func _on_hp_bar_timer_timeout(hp_bar: ProgressBar, timer: Timer):
 	if hp_bar and is_inside_tree():
 		hp_bar.queue_free()
+	if timer and is_inside_tree():
+		timer.queue_free()
