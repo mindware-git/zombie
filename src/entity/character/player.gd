@@ -3,21 +3,32 @@ class_name Player
 
 enum WeaponType {FIST, GUN}
 
+var bullet_scene = preload("res://src/entity/bullet.tscn")
+
 var current_interact_id: String
 var max_stamina: int = 100
 var current_stamina: int = 100
 var attack_stamina_cost: int = 10
 var current_weapon: WeaponType = WeaponType.FIST
+var last_non_zero_direction: Vector2 = Vector2.UP # 기본값은 위쪽
+
+@onready var inventory_ui = $CanvasLayer/InventoryUI
 
 func _ready():
 	super._ready()
 	global_position = SaveManager.game_data.position
 	update_hp_bar()
 	update_stamina_bar()
-	attack_damage = 50
+
+	create_inventory()
+
+	update_weapon(WeaponType.GUN)
+	$CanvasLayer/AttackButton.show()
 
 func _process(delta: float) -> void:
 	var direction = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	if direction != Vector2.ZERO:
+		last_non_zero_direction = direction
 	current_direction = direction.normalized()
 	velocity = direction * delta * 20000
 	update_sprite_direction()
@@ -32,13 +43,14 @@ func update_weapon(type: WeaponType):
 	if type == WeaponType.GUN:
 		current_weapon = WeaponType.GUN
 		attack_range = 200
-		attack_cooltime = 10
-		attack_damage = 200
+		attack_cooltime = 0.1
+		attack_damage = 50
+		attack_stamina_cost = 1
 	else:
 		current_weapon = WeaponType.FIST
 		attack_range = 50
-		attack_cooltime = 0.5
-		attack_damage = 50
+		attack_cooltime = 5
+		attack_damage = 5
 
 func interact_entered(interact_id: String):
 	current_interact_id = interact_id
@@ -70,10 +82,7 @@ func interact():
 			# 문 열기 로직 - 게임 씬의 문 노드 찾기
 			var door_node = get_tree().current_scene.get_node("Door")
 			if door_node:
-				# 문의 충돌 모양 비활성화
-				door_node.get_node("CollisionShape2D").disabled = true
-				# 문의 시각적 효과 (위치를 위로 이동)
-				door_node.position.y -= 50
+				door_node.queue_free()
 				$CanvasLayer/DialogueLabel.text = "문이 열렸습니다!"
 			else:
 				$CanvasLayer/DialogueLabel.text = "문을 찾을 수 없습니다."
@@ -94,6 +103,10 @@ func interact():
 			canvas_modulate.color = Color.WHITE # 밝게
 			$CanvasLayer/DialogueLabel.text = "발전기를 켰습니다. 건물 전체에 불이 들어옵니다!"
 		$CanvasLayer/DialogueLabel.show()
+	elif current_interact_id == "door_lock":
+		print("Door lock")
+		# door lock UI popup.
+		$CanvasLayer/DoorLockUI.show()
 	$CanvasLayer/InteractButton.hide()
 
 func _on_interact_button_pressed() -> void:
@@ -134,6 +147,19 @@ func find_nearest_enemy() -> Enemy:
 	return nearest_enemy
 
 func execute_player_attack():
+	if current_weapon == WeaponType.GUN:
+		# 적이 없어도 RAYCast2D로 발사.
+		var bullet = bullet_scene.instantiate()
+
+		bullet.global_position = global_position
+		bullet.direction = last_non_zero_direction.normalized()
+		bullet.damage = attack_damage
+		
+		# 씬에 추가
+		get_tree().current_scene.add_child(bullet)
+		attack_timer = attack_cooltime
+		return
+	
 	var nearest_enemy = find_nearest_enemy()
 	if nearest_enemy:
 		target = nearest_enemy
@@ -153,78 +179,64 @@ func execute_player_attack():
 		print("공격 범위에 적이 없습니다.")
 
 
-func show_inventory():
-	# 인벤토리 UI 생성
-	var inventory_ui = Control.new()
-	inventory_ui.name = "InventoryUI"
-	inventory_ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	inventory_ui.process_mode = Node.PROCESS_MODE_ALWAYS # pause 상태에서도 입력 처리
-	
-	# 반투명 배경
-	var background = ColorRect.new()
-	background.color = Color(0, 0, 0, 0.8)
-	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	inventory_ui.add_child(background)
-	
-	# 메인 컨테이너
-	var main_container = VBoxContainer.new()
+func create_inventory():
+	var main_container = $CanvasLayer/InventoryUI/MainContainer
 	main_container.position = Vector2(100, 100)
 	main_container.size = Vector2(600, 400)
-	inventory_ui.add_child(main_container)
-	
-	# 제목
-	var title_label = Label.new()
+
+	var title_label = $CanvasLayer/InventoryUI/MainContainer/TitleLabel
 	title_label.text = "인벤토리"
 	title_label.add_theme_font_size_override("font_size", 24)
-	main_container.add_child(title_label)
-	
+
 	# 아이템 그리드
-	var grid_container = GridContainer.new()
+	var grid_container = $CanvasLayer/InventoryUI/MainContainer/GridContainer
 	grid_container.columns = 5
 	grid_container.size = Vector2(580, 300)
 	
-	# 슬롯 20개 생성 (소유한 아이템 표시)
+	# 슬롯 20개 생성 (빈 슬롯으로만 생성)
+	var template_button = $CanvasLayer/TemplateButton
 	for i in range(20):
-		var slot = ColorRect.new()
-		slot.size = Vector2(50, 50)
+		var slot = template_button.duplicate()
+		slot.show()
 		slot.custom_minimum_size = Vector2(50, 50)
 		
-		var slot_label = Label.new()
-		slot_label.position = Vector2(20, 15)
+		# 슬롯 클릭 이벤트 연결
+		slot.pressed.connect(_on_slot_clicked.bind(i))
 		
-		# 소유한 아이템이 있으면 표시
-		if i < SaveManager.game_data.owned_entities.size():
-			var item = SaveManager.game_data.owned_entities[i]
-			slot.color = Color(0.6, 0.4, 0.2, 0.8) # 아이템이 있는 슬롯 색상
-			slot_label.text = "ID:" + str(item.id)
-		else:
-			slot.color = Color(0.3, 0.3, 0.3, 0.8) # 빈 슬롯 색상
-			slot_label.text = str(i + 1)
-		
-		slot.add_child(slot_label)
 		grid_container.add_child(slot)
-	
-	main_container.add_child(grid_container)
-	
-	# 닫기 버튼
-	var close_button = Button.new()
-	close_button.text = "닫기 (ESC)"
-	close_button.custom_minimum_size = Vector2(100, 40)
-	close_button.pressed.connect(hide_inventory)
-	main_container.add_child(close_button)
-	
-	# CanvasLayer에 추가
-	$CanvasLayer.add_child(inventory_ui)
 
-func hide_inventory():
-	get_tree().paused = false
-	var inventory_ui = $CanvasLayer.get_node_or_null("InventoryUI")
-	if inventory_ui:
-		inventory_ui.queue_free()
+func update_inventory():
+	var grid_container = $CanvasLayer/InventoryUI/MainContainer/GridContainer
+	var slots = grid_container.get_children()
+	
+	# 기존 슬롯들의 내용 업데이트
+	for i in range(20):
+		if i < slots.size():
+			var slot = slots[i] as TextureButton
+			
+			# 소유한 아이템이 있으면 표시
+			if i < SaveManager.game_data.owned_entities.size():
+				slot.modulate = Color(0.6, 0.4, 0.2, 0.8) # 아이템이 있는 슬롯 색상
+			else:
+				slot.modulate = Color(0.3, 0.3, 0.3, 0.8) # 빈 슬롯 색상
 
 func _on_inventory_button_pressed() -> void:
 	get_tree().paused = true
-	show_inventory()
+	update_inventory()
+	inventory_ui.show()
+	$"CanvasLayer/Virtual Joystick".hide()
+
+func _on_slot_clicked(slot_index: int) -> void:
+	# 아이템이 있는 슬롯만 클릭 가능
+	if slot_index < SaveManager.game_data.owned_entities.size():
+		var item_detail_scene = preload("res://src/entity/character/item_detail.tscn")
+		var item_detail = item_detail_scene.instantiate()
+		$CanvasLayer.add_child(item_detail)
+
+func _on_close_button_pressed() -> void:
+	get_tree().paused = false
+	inventory_ui.hide()
+	$"CanvasLayer/Virtual Joystick".show()
 
 func take_damage(amount: int) -> void:
 	super.take_damage(amount)
@@ -240,3 +252,7 @@ func update_hp_bar():
 func update_stamina_bar():
 	var stamina_percentage = float(current_stamina) / float(max_stamina) * 100.0
 	$CanvasLayer/VBoxContainer/StaminaBar.value = stamina_percentage
+
+
+func _on_lock_close_button_pressed() -> void:
+	$CanvasLayer/DoorLockUI.hide()

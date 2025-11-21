@@ -1,0 +1,35 @@
+[gd_scene load_steps=8 format=4 uid="uid://b7lewtw3iao8"]
+
+[ext_resource type="TileSet" uid="uid://dlw2gnvccs563" path="res://assets/tile.tres" id="1_5eluk"]
+[ext_resource type="PackedScene" uid="uid://dy5id1u8jd7pp" path="res://src/stage/portal.tscn" id="2_u15ri"]
+[ext_resource type="PackedScene" uid="uid://ctx8ycvc8vc3o" path="res://src/stage/stage2.tscn" id="3_21ylx"]
+[ext_resource type="PackedScene" uid="uid://7dyfjwrfhspo" path="res://src/stage/save_zone.tscn" id="3_yhq4e"]
+[ext_resource type="PackedScene" uid="uid://crhggnm18cemu" path="res://src/entity/interact_entity.tscn" id="4_owrlt"]
+[ext_resource type="Texture2D" uid="uid://dpwgj2iees1uu" path="res://assets/radio.png" id="5_l17dg"]
+[ext_resource type="PackedScene" uid="uid://hykxqlcxtasf" path="res://src/entity/character/enemy.tscn" id="6_rdpwm"]
+
+[node name="Stage1" type="Node2D"]
+
+[node name="TileMap" type="Node2D" parent="."]
+
+[node name="TileMapLayer" type="TileMapLayer" parent="TileMap"]
+tile_map_data = PackedByteArray("AAD7////AAAAAAMAAAD7/wAAAAAAAAMAAAD7/wEAAAAAAAMAAAD7/wIAAAAAAAMAAAD7/wMAAAAAAAMAAAAIAAEAAAAAAAMAAAAIAAIAAAAAAAMAAAAIAAMAAAAAAAMAAAA=")
+tile_set = ExtResource("1_5eluk")
+
+[node name="Portal" parent="." instance=ExtResource("2_u15ri")]
+position = Vector2(500, 500)
+destination_scene = ExtResource("3_21ylx")
+
+[node name="SaveZone" parent="." instance=ExtResource("3_yhq4e")]
+
+[node name="Radio" parent="." instance=ExtResource("4_owrlt")]
+position = Vector2(200, 100)
+interact_type = "radio"
+entity_texture = ExtResource("5_l17dg")
+
+[node name="Dog" parent="." instance=ExtResource("6_rdpwm")]
+position = Vector2(1500, -200)
+
+[node name="King" parent="." instance=ExtResource("6_rdpwm")]
+position = Vector2(2000, 0)
+max_hp = 1000

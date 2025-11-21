@@ -1,0 +1,67 @@
+[gd_scene load_steps=9 format=3 uid="uid://hykxqlcxtasf"]
+
+[ext_resource type="Script" uid="uid://b6r01kifg04kf" path="res://src/entity/character/enemy.gd" id="1_80lyg"]
+[ext_resource type="Texture2D" uid="uid://dxjkn4tgyuule" path="res://assets/TX Player.png" id="2_a3a0d"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_a3a0d"]
+size = Vector2(24, 40)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_np8l1"]
+atlas = ExtResource("2_a3a0d")
+region = Rect2(0, 0, 32, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_18y28"]
+atlas = ExtResource("2_a3a0d")
+region = Rect2(32, 0, 32, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b7oss"]
+atlas = ExtResource("2_a3a0d")
+region = Rect2(64, 0, 32, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_lco28"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_np8l1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_18y28")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b7oss")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_80lyg"]
+radius = 160.3122
+
+[node name="Enemy" type="CharacterBody2D"]
+collision_layer = 5
+script = ExtResource("1_80lyg")
+metadata/_custom_type_script = "uid://b6r01kifg04kf"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_a3a0d")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_lco28")
+
+[node name="DetectRange" type="Area2D" parent="."]
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectRange"]
+shape = SubResource("CircleShape2D_80lyg")
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+
+[node name="HPBarTimer" type="Timer" parent="."]
+
+[node name="HPBar" type="ProgressBar" parent="."]
+offset_top = -50.0
+offset_right = 4.0
+offset_bottom = -23.0
+
+[connection signal="timeout" from="HPBarTimer" to="." method="_on_hp_bar_timer_timeout"]

@@ -12,6 +12,14 @@ var in_attack_range = false
 var current_state: EnemyState = EnemyState.IDLE
 var player_detected = false
 
+# 어슬렁 거리기 관련 변수
+var wander_timer: float = 0.0
+var wander_direction: Vector2 = Vector2.ZERO
+var is_wandering: bool = false
+var wander_speed: float = 30.0 # 추격 속도보다 느리게
+var wander_duration: float = 2.0 # 움직임 지속 시간
+var idle_wait_time: float = 3.0 # 대기 시간
+
 func _ready() -> void:
 	super._ready()
 	add_to_group("enemy")
@@ -19,6 +27,24 @@ func _ready() -> void:
 	# DetectRange 시그널 연결
 	$DetectRange.body_entered.connect(_on_detect_range_body_entered)
 	$DetectRange.body_exited.connect(_on_detect_range_body_exited)
+	
+	# HP 바 초기 설정
+	$HPBar.visible = false
+	$HPBar.max_value = max_hp
+	$HPBar.value = current_hp
+	
+	# 스타일 설정
+	var style_box = StyleBoxFlat.new()
+	style_box.bg_color = Color.RED
+	style_box.border_width_left = 1
+	style_box.border_width_right = 1
+	style_box.border_width_top = 1
+	style_box.border_width_bottom = 1
+	style_box.border_color = Color.BLACK
+	$HPBar.add_theme_stylebox_override("fill", style_box)
+	
+	# 어슬렁 거리기 초기화
+	start_idle_wait()
 
 func _process(delta: float) -> void:
 		match current_state:
@@ -29,8 +55,27 @@ func _process(delta: float) -> void:
 				EnemyState.ATTACK:
 						_handle_attack_state(delta)
 
-func _handle_idle_state(_delta: float) -> void:
-		pass
+func _handle_idle_state(delta: float) -> void:
+	# 타이머 업데이트
+	wander_timer -= delta
+	
+	if wander_timer <= 0:
+		# 상태 전환
+		if is_wandering:
+			# 움직임 멈추고 대기 시작
+			start_idle_wait()
+		else:
+			# 랜덤 방향으로 움직임 시작
+			start_wandering()
+	
+	# 움직임 상태일 때만 이동
+	if is_wandering:
+		velocity = wander_direction * wander_speed
+		move_and_slide()
+		current_direction = wander_direction
+		update_sprite_direction()
+	else:
+		velocity = Vector2.ZERO
 
 func _handle_chase_state(_delta: float) -> void:
 		if target:
@@ -88,6 +133,8 @@ func _on_detect_range_body_exited(_body: Node2D) -> void:
 		if current_state == EnemyState.CHASE:
 				current_state = EnemyState.IDLE
 				target = null
+				# 추격이 끝나면 다시 어슬렁 거리기 시작
+				start_idle_wait()
 
 #func _on_timer_timeout() -> void:
 		#attackable = true
@@ -99,41 +146,37 @@ func take_damage(amount: int) -> void:
 	show_hp_bar()
 
 func show_hp_bar():
-	# 이미 HP 바가 표시 중이면 제거
-	if has_node("HPBarDisplay"):
-		$HPBarDisplay.queue_free()
+	# HP 바가 이미 표시 중이면 값만 업데이트하고 타이머 리셋
+	if $HPBar.visible:
+		$HPBar.value = current_hp
+	else:
+		# HP 바가 숨겨져 있으면 보여주고 값 설정
+		$HPBar.visible = true
+		$HPBar.value = current_hp
 	
-	# HP 바 생성
-	var hp_bar = ProgressBar.new()
-	hp_bar.name = "HPBarDisplay"
-	hp_bar.position = Vector2(-25, -50) # 머리 위 위치
-	hp_bar.size = Vector2(50, 8)
-	hp_bar.max_value = max_hp
-	hp_bar.value = current_hp
-	
-	# 스타일 설정
-	var style_box = StyleBoxFlat.new()
-	style_box.bg_color = Color.RED
-	style_box.border_width_left = 1
-	style_box.border_width_right = 1
-	style_box.border_width_top = 1
-	style_box.border_width_bottom = 1
-	style_box.border_color = Color.BLACK
-	hp_bar.add_theme_stylebox_override("fill", style_box)
-	
-	# Enemy에 추가
-	add_child(hp_bar)
-	
-	# Timer를 직접 생성하고 관리
-	var timer = Timer.new()
-	timer.wait_time = 1.0
-	timer.one_shot = true
-	timer.timeout.connect(_on_hp_bar_timer_timeout.bind(hp_bar, timer))
-	add_child(timer)
-	timer.start()
+	# 타이머 리셋하고 시작
+	$HPBarTimer.stop()
+	$HPBarTimer.start()
 
-func _on_hp_bar_timer_timeout(hp_bar: ProgressBar, timer: Timer):
-	if hp_bar and is_inside_tree():
-		hp_bar.queue_free()
-	if timer and is_inside_tree():
-		timer.queue_free()
+
+func _on_hp_bar_timer_timeout() -> void:
+	# 타이머가 만료되면 HP 바 숨김
+	$HPBar.visible = false
+
+# 어슬렁 거리기 보조 함수들
+func start_wandering():
+	# 랜덤 방향 생성 (360도)
+	var random_angle = randf() * 2 * PI
+	wander_direction = Vector2.from_angle(random_angle)
+	
+	# 움직임 상태로 전환
+	is_wandering = true
+	wander_timer = wander_duration
+
+func start_idle_wait():
+	# 대기 상태로 전환
+	is_wandering = false
+	wander_timer = idle_wait_time + randf() * 2.0 # 랜덤성 추가
+	
+	# 속도 멈춤
+	velocity = Vector2.ZERO

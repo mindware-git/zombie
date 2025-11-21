@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://crhggnm18cemu"]
+
+[ext_resource type="Script" uid="uid://c1j2cmgunccjx" path="res://src/entity/interact_entity.gd" id="1_y3mbl"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_y3mbl"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_v5ide"]
+radius = 123.79418
+
+[node name="InteractEntity" type="StaticBody2D"]
+script = ExtResource("1_y3mbl")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_y3mbl")
+
+[node name="DetectRange" type="Area2D" parent="."]
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectRange"]
+shape = SubResource("CircleShape2D_v5ide")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]

@@ -1,55 +1,8 @@
-[gd_scene load_steps=19 format=4 uid="uid://cptd0fn0dngjt"]
+[gd_scene load_steps=4 format=3 uid="uid://cptd0fn0dngjt"]
 
 [ext_resource type="Script" uid="uid://cjahnc52sc5hg" path="res://src/game.gd" id="1_7uq6d"]
-[ext_resource type="TileSet" uid="uid://dlw2gnvccs563" path="res://assets/tile.tres" id="2_4bcji"]
+[ext_resource type="PackedScene" uid="uid://b7lewtw3iao8" path="res://src/stage/stage1.tscn" id="3_cdx1q"]
 [ext_resource type="PackedScene" uid="uid://do56hern7xrg" path="res://src/entity/character/player.tscn" id="3_xq6wo"]
-[ext_resource type="Texture2D" uid="uid://dpwgj2iees1uu" path="res://assets/radio.png" id="4_4bcji"]
-[ext_resource type="Texture2D" uid="uid://dhilet4jng7wh" path="res://assets/main_char.png" id="5_bs6l1"]
-[ext_resource type="Texture2D" uid="uid://ddbojxn1xfqnk" path="res://assets/door.png" id="6_cdx1q"]
-[ext_resource type="Script" uid="uid://b6r01kifg04kf" path="res://src/entity/character/enemy.gd" id="6_wqvko"]
-[ext_resource type="Texture2D" uid="uid://b74xj0dxhyv0q" path="res://assets/generator.png" id="7_4bcji"]
-[ext_resource type="Texture2D" uid="uid://dxjkn4tgyuule" path="res://assets/TX Player.png" id="7_wqvko"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_bs6l1"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_bs6l1"]
-radius = 123.79418
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_kc8ui"]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_cdx1q"]
-atlas = ExtResource("7_wqvko")
-region = Rect2(0, 0, 32, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_4bcji"]
-atlas = ExtResource("7_wqvko")
-region = Rect2(32, 0, 32, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_uktfx"]
-atlas = ExtResource("7_wqvko")
-region = Rect2(64, 0, 32, 64)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_pk08u"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_cdx1q")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_4bcji")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_uktfx")
-}],
-"loop": true,
-"name": &"default",
-"speed": 5.0
-}]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_pk08u"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_wqvko"]
-radius = 160.3122
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_7uq6d")
@@ -57,21 +10,25 @@ script = ExtResource("1_7uq6d")
 [node name="Timer" type="Timer" parent="."]
 autostart = true
 
-[node name="TileMap" type="TileMap" parent="."]
-format = 2
+[node name="Player" parent="." instance=ExtResource("3_xq6wo")]
+attack_damage = 50
 
-[node name="TileMapLayer" type="TileMapLayer" parent="TileMap"]
-tile_map_data = PackedByteArray("AAD3//L/AAAAAAMAAAD3//P/AAAAAAMAAAD3//T/AAAAAAMAAAD3//X/AAAAAAMAAAD3//b/AAAAAAMAAAD3//f/AAAAAAMAAAD3//j/AAAAAAMAAAD3//n/AAAAAAMAAAD3//r/AAAAAAMAAAD3//v/AAAAAAMAAAD3//z/AAAAAAMAAAD3//3/AAAAAAMAAAD3//7/AAAAAAMAAAD3////AAAAAAMAAAD3/wAAAAAAAAMAAAD3/wEAAAAAAAMAAAD3/wIAAAAAAAMAAAD3/wMAAAAAAAMAAAD3/wQAAAAAAAMAAAD3/wUAAAAAAAMAAAD3/wYAAAAAAAMAAAD3/wcAAAAAAAMAAAD3/wgAAAAAAAMAAAD3/wkAAAAAAAMAAAD4//L/AAAAAAMAAAD5//L/AAAAAAMAAAD6//L/AAAAAAMAAAD7//L/AAAAAAMAAAD8//L/AAAAAAMAAAD9//L/AAAAAAMAAAD+//L/AAAAAAMAAAD///L/AAAAAAMAAAAAAPL/AAAAAAMAAAABAPL/AAAAAAMAAAACAPL/AAAAAAMAAAADAPL/AAAAAAMAAAAEAPL/AAAAAAMAAAAFAPL/AAAAAAMAAAAGAPL/AAAAAAMAAAAHAPL/AAAAAAMAAAAIAPL/AAAAAAMAAAAJAPL/AAAAAAMAAAAKAPL/AAAAAAMAAAALAPL/AAAAAAMAAAAMAPL/AAAAAAMAAAANAPL/AAAAAAMAAAAOAPL/AAAAAAMAAAAPAPL/AAAAAAMAAAAQAPL/AAAAAAMAAAARAPL/AAAAAAMAAAASAPL/AAAAAAMAAAD3/woAAAAAAAMAAAD4/woAAAAAAAMAAAD5/woAAAAAAAMAAAD6/woAAAAAAAMAAAD7/woAAAAAAAMAAAD8/woAAAAAAAMAAAD9/woAAAAAAAMAAAD+/woAAAAAAAMAAAD//woAAAAAAAMAAAAAAAoAAAAAAAMAAAABAAoAAAAAAAMAAAACAAoAAAAAAAMAAAADAAoAAAAAAAMAAAAEAAoAAAAAAAMAAAAFAAoAAAAAAAMAAAAGAAoAAAAAAAMAAAAHAAoAAAAAAAMAAAAIAAoAAAAAAAMAAAAJAAoAAAAAAAMAAAAKAAoAAAAAAAMAAAALAAoAAAAAAAMAAAAMAAoAAAAAAAMAAAANAAoAAAAAAAMAAAAOAAoAAAAAAAMAAAAPAAoAAAAAAAMAAAAQAAoAAAAAAAMAAAARAAoAAAAAAAMAAAASAAoAAAAAAAMAAAATAAoAAAAAAAMAAAAUAAoAAAAAAAMAAAAUAAQAAAAAAAMAAAAUAAUAAAAAAAMAAAAUAAYAAAAAAAMAAAAUAAcAAAAAAAMAAAAUAAgAAAAAAAMAAAAUAAkAAAAAAAMAAAAUAPL/AAAAAAMAAAAUAPP/AAAAAAMAAAAUAPT/AAAAAAMAAAAUAPX/AAAAAAMAAAAUAPb/AAAAAAMAAAAUAPf/AAAAAAMAAAAUAPj/AAAAAAMAAAAUAPn/AAAAAAMAAAAUAPr/AAAAAAMAAAAUAPv/AAAAAAMAAAATAPL/AAAAAAMAAAAVAOb/AAAAAAMAAAAVAOf/AAAAAAMAAAAVAOj/AAAAAAMAAAAVAOn/AAAAAAMAAAAVAOr/AAAAAAMAAAAVAOv/AAAAAAMAAAAVAOz/AAAAAAMAAAAVAO3/AAAAAAMAAAAVAO7/AAAAAAMAAAAVAO//AAAAAAMAAAAVAPD/AAAAAAMAAAAVAPH/AAAAAAMAAAAVAPL/AAAAAAMAAAAVAPP/AAAAAAMAAAAVAPT/AAAAAAMAAAAVAPX/AAAAAAMAAAAVAPb/AAAAAAMAAAAVAPf/AAAAAAMAAAAVAPj/AAAAAAMAAAAVAPn/AAAAAAMAAAAVAPr/AAAAAAMAAAAVAPv/AAAAAAMAAAAVAAQAAAAAAAMAAAAVAAUAAAAAAAMAAAAVAAYAAAAAAAMAAAAVAAcAAAAAAAMAAAAVAAgAAAAAAAMAAAAVAAkAAAAAAAMAAAAVAAoAAAAAAAMAAAAVAAsAAAAAAAMAAAAVAAwAAAAAAAMAAAAVAA0AAAAAAAMAAAAVAA4AAAAAAAMAAAAVAA8AAAAAAAMAAAAVABAAAAAAAAMAAAAVABEAAAAAAAMAAAAVABIAAAAAAAMAAAAVABMAAAAAAAMAAAAvANn/AAAAAAMAAAAvANr/AAAAAAMAAAAvANv/AAAAAAMAAAAvANz/AAAAAAMAAAAvAN3/AAAAAAMAAAAvAN7/AAAAAAMAAAAvAN//AAAAAAMAAAAvAOD/AAAAAAMAAAAvAOH/AAAAAAMAAAAvAOL/AAAAAAMAAAAvAOP/AAAAAAMAAAAvAOT/AAAAAAMAAAAvAOX/AAAAAAMAAAAvAOb/AAAAAAMAAAAvAOf/AAAAAAMAAAAvAOj/AAAAAAMAAAAvAOn/AAAAAAMAAAAvAOr/AAAAAAMAAAAvAOv/AAAAAAMAAAAvAOz/AAAAAAMAAAAvAO3/AAAAAAMAAAAvAO7/AAAAAAMAAAAvAO//AAAAAAMAAAAvAPD/AAAAAAMAAAAvAPH/AAAAAAMAAAAvAPL/AAAAAAMAAAAvAPP/AAAAAAMAAAAvAPT/AAAAAAMAAAAvAPX/AAAAAAMAAAAvAPb/AAAAAAMAAAAvAPf/AAAAAAMAAAAvAPj/AAAAAAMAAAAvAPn/AAAAAAMAAAAvAPr/AAAAAAMAAAAvAPv/AAAAAAMAAAAvAPz/AAAAAAMAAAAvAP3/AAAAAAMAAAAvAP7/AAAAAAMAAAAvAP//AAAAAAMAAAAvAAAAAAAAAAMAAAAvAAEAAAAAAAMAAAAvAAIAAAAAAAMAAAAvAAMAAAAAAAMAAAAvAAQAAAAAAAMAAAAvAAUAAAAAAAMAAAAvAAYAAAAAAAMAAAAvAAcAAAAAAAMAAAAvAAgAAAAAAAMAAAAvAAkAAAAAAAMAAAAvAAoAAAAAAAMAAAAvAAsAAAAAAAMAAAAvAAwAAAAAAAMAAAAvAA0AAAAAAAMAAAAvAA4AAAAAAAMAAAAvAA8AAAAAAAMAAAAvABAAAAAAAAMAAAAvABEAAAAAAAMAAAAvABIAAAAAAAMAAAAvABMAAAAAAAMAAAAvABQAAAAAAAMAAAAvABUAAAAAAAMAAAAvABYAAAAAAAMAAAAvABcAAAAAAAMAAAAvABgAAAAAAAMAAAAvABkAAAAAAAMAAAAvABoAAAAAAAMAAAAvABsAAAAAAAMAAAAvABwAAAAAAAMAAAAvAB0AAAAAAAMAAAAvAB4AAAAAAAMAAAAvAB8AAAAAAAMAAAA=")
-tile_set = ExtResource("2_4bcji")
+[node name="Camera2D" type="Camera2D" parent="Player"]
+
+[node name="Stage" type="Node2D" parent="."]
+
+[node name="Stage1" parent="Stage" instance=ExtResource("3_cdx1q")]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -0.5
+offset_right = 0.5
+offset_bottom = 23.0
 grow_horizontal = 2
-grow_vertical = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/VBoxContainer"]
 layout_mode = 2
@@ -80,106 +37,7 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 6
 
-[node name="Player" parent="." instance=ExtResource("3_xq6wo")]
-attack_damage = 50
-
-[node name="Camera2D" type="Camera2D" parent="Player"]
-
-[node name="Radio" type="StaticBody2D" parent="."]
-position = Vector2(200, 100)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Radio"]
-shape = SubResource("RectangleShape2D_bs6l1")
-
-[node name="Sprite2D" type="Sprite2D" parent="Radio"]
-texture = ExtResource("4_4bcji")
-
-[node name="DetectRange" type="Area2D" parent="Radio"]
-collision_mask = 2
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Radio/DetectRange"]
-shape = SubResource("CircleShape2D_bs6l1")
-
-[node name="SaveZone" type="Area2D" parent="."]
-position = Vector2(400, 250)
-scale = Vector2(5, 5)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="SaveZone"]
-shape = SubResource("RectangleShape2D_kc8ui")
-
-[node name="Guard" type="StaticBody2D" parent="."]
-position = Vector2(1000, 0)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Guard"]
-shape = SubResource("RectangleShape2D_bs6l1")
-
-[node name="Sprite2D" type="Sprite2D" parent="Guard"]
-texture = ExtResource("5_bs6l1")
-
-[node name="DetectRange" type="Area2D" parent="Guard"]
-collision_mask = 2
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Guard/DetectRange"]
-shape = SubResource("CircleShape2D_bs6l1")
-
-[node name="Door" type="StaticBody2D" parent="."]
-position = Vector2(100, 500)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Door"]
-shape = SubResource("RectangleShape2D_bs6l1")
-
-[node name="Sprite2D" type="Sprite2D" parent="Door"]
-texture = ExtResource("6_cdx1q")
-
-[node name="DetectRange" type="Area2D" parent="Door"]
-collision_mask = 2
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Door/DetectRange"]
-shape = SubResource("CircleShape2D_bs6l1")
-
-[node name="Generator" type="StaticBody2D" parent="."]
-position = Vector2(-400, 500)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Generator"]
-shape = SubResource("RectangleShape2D_bs6l1")
-
-[node name="Sprite2D" type="Sprite2D" parent="Generator"]
-texture = ExtResource("7_4bcji")
-
-[node name="DetectRange" type="Area2D" parent="Generator"]
-collision_mask = 2
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Generator/DetectRange"]
-shape = SubResource("CircleShape2D_bs6l1")
-
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
-
-[node name="Dog" type="CharacterBody2D" parent="."]
-position = Vector2(2000, 0)
-script = ExtResource("6_wqvko")
-metadata/_custom_type_script = "uid://b6r01kifg04kf"
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Dog"]
-sprite_frames = SubResource("SpriteFrames_pk08u")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Dog"]
-shape = SubResource("RectangleShape2D_pk08u")
-
-[node name="DetectRange" type="Area2D" parent="Dog"]
-collision_mask = 2
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Dog/DetectRange"]
-shape = SubResource("CircleShape2D_wqvko")
-
-[node name="RayCast2D" type="RayCast2D" parent="Dog"]
+color = Color(0.5019608, 0.5019608, 0.5019608, 1)
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
-[connection signal="body_entered" from="Radio/DetectRange" to="." method="_on_detect_range_body_entered"]
-[connection signal="body_exited" from="Radio/DetectRange" to="." method="_on_detect_range_body_exited"]
-[connection signal="body_entered" from="SaveZone" to="." method="_on_save_zone_body_entered"]
-[connection signal="body_entered" from="Guard/DetectRange" to="." method="_on_guard_detect_range_body_entered"]
-[connection signal="body_exited" from="Guard/DetectRange" to="." method="_on_guard_detect_range_body_exited"]
-[connection signal="body_entered" from="Door/DetectRange" to="." method="_on_door_detect_range_body_entered"]
-[connection signal="body_exited" from="Door/DetectRange" to="." method="_on_door_detect_range_body_exited"]
-[connection signal="body_entered" from="Generator/DetectRange" to="." method="_on_generator_detect_range_body_entered"]
-[connection signal="body_exited" from="Generator/DetectRange" to="." method="_on_generator_detect_range_body_exited"]
