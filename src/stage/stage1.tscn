@@ -1,10 +1,13 @@
-[gd_scene load_steps=8 format=4 uid="uid://b7lewtw3iao8"]
+[gd_scene load_steps=11 format=4 uid="uid://b7lewtw3iao8"]
 
 [ext_resource type="TileSet" uid="uid://dlw2gnvccs563" path="res://assets/tile.tres" id="1_5eluk"]
+[ext_resource type="Texture2D" uid="uid://fexoqp8h4mts" path="res://assets/farm_Isometric/woodWallGateClosed_N.png" id="2_r8vjb"]
 [ext_resource type="PackedScene" uid="uid://dy5id1u8jd7pp" path="res://src/stage/portal.tscn" id="2_u15ri"]
 [ext_resource type="PackedScene" uid="uid://ctx8ycvc8vc3o" path="res://src/stage/stage2.tscn" id="3_21ylx"]
+[ext_resource type="Texture2D" uid="uid://cw2vipxnfadj1" path="res://assets/farm_Isometric/woodWall_W.png" id="3_x2pjg"]
 [ext_resource type="PackedScene" uid="uid://7dyfjwrfhspo" path="res://src/stage/save_zone.tscn" id="3_yhq4e"]
 [ext_resource type="PackedScene" uid="uid://crhggnm18cemu" path="res://src/entity/interact_entity.tscn" id="4_owrlt"]
+[ext_resource type="Texture2D" uid="uid://b1adwd0rslxu6" path="res://assets/farm_Isometric/roofSingleWall_N.png" id="4_xo2cd"]
 [ext_resource type="Texture2D" uid="uid://dpwgj2iees1uu" path="res://assets/radio.png" id="5_l17dg"]
 [ext_resource type="PackedScene" uid="uid://hykxqlcxtasf" path="res://src/entity/character/enemy.tscn" id="6_rdpwm"]
 
@@ -15,6 +18,20 @@
 [node name="TileMapLayer" type="TileMapLayer" parent="TileMap"]
 tile_map_data = PackedByteArray("AAD7////AAAAAAMAAAD7/wAAAAAAAAMAAAD7/wEAAAAAAAMAAAD7/wIAAAAAAAMAAAD7/wMAAAAAAAMAAAAIAAEAAAAAAAMAAAAIAAIAAAAAAAMAAAAIAAMAAAAAAAMAAAA=")
 tile_set = ExtResource("1_5eluk")
+
+[node name="House" type="Node2D" parent="TileMap"]
+
+[node name="WoodWallGateClosedN" type="Sprite2D" parent="TileMap/House"]
+position = Vector2(553, 466)
+texture = ExtResource("2_r8vjb")
+
+[node name="WoodWallW" type="Sprite2D" parent="TileMap/House"]
+position = Vector2(556, 459)
+texture = ExtResource("3_x2pjg")
+
+[node name="RoofSingleWallN" type="Sprite2D" parent="TileMap/House"]
+position = Vector2(556, 300)
+texture = ExtResource("4_xo2cd")
 
 [node name="Portal" parent="." instance=ExtResource("2_u15ri")]
 position = Vector2(500, 500)
