@@ -12,7 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://bg5g8ahgnm055" path="res://assets/bag.png" id="9_827nk"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wx0ku"]
-size = Vector2(95.5, 125)
+size = Vector2(8, 8)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_jf050"]
 animations = [{
@@ -76,7 +76,7 @@ script = ExtResource("1_jf050")
 metadata/_custom_type_script = "uid://brft2fmwv7uaw"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-1.25, -0.5)
+position = Vector2(1, 8)
 shape = SubResource("RectangleShape2D_wx0ku")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
